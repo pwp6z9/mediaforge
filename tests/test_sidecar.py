@@ -9,8 +9,10 @@ import time
 import uuid
 from pathlib import Path
 
-# Set PYTHONPATH to include sidecar directory
-sidecar_path = '/sessions/sweet-affectionate-ramanujan/mediaforge/sidecar'
+# Set PYTHONPATH to include sidecar directory (works from any working directory)
+_test_dir = os.path.dirname(os.path.abspath(__file__))
+_repo_root = os.path.dirname(_test_dir)
+sidecar_path = os.path.join(_repo_root, 'sidecar')
 sys.path.insert(0, sidecar_path)
 
 # Color codes for output
@@ -343,7 +345,7 @@ def test_json_rpc_integration():
     """Test 5: JSON-RPC integration with sidecar subprocess."""
     print(f"\n{BOLD}TEST 5: JSON-RPC Integration{RESET}")
     
-    main_py = '/sessions/sweet-affectionate-ramanujan/mediaforge/sidecar/main.py'
+    main_py = os.path.join(sidecar_path, 'main.py')
     
     try:
         # Start sidecar process

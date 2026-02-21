@@ -59,6 +59,7 @@ jobs:
         run: |
           pip install pyinstaller --break-system-packages
           pip install pyyaml numpy --break-system-packages
+          mkdir -p src-tauri/binaries
           cd sidecar
           pyinstaller --onefile --name sidecar main.py
           cp dist/sidecar ../src-tauri/binaries/sidecar-x86_64-unknown-linux-gnu
@@ -115,10 +116,10 @@ jobs:
       - name: Build Python sidecar binary
         run: |
           pip install pyinstaller pyyaml numpy
+          New-Item -ItemType Directory -Force -Path src-tauri/binaries
           cd sidecar
           pyinstaller --onefile --name sidecar main.py
-          copy dist\sidecar.exe ..\src-tauri\binaries\sidecar-x86_64-pc-windows-msvc.exe
-        shell: cmd
+          Copy-Item dist/sidecar.exe ../src-tauri/binaries/sidecar-x86_64-pc-windows-msvc.exe
 
       - name: Build Tauri app
         run: npx tauri build

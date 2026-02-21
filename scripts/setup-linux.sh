@@ -61,6 +61,7 @@ echo "[OK] Tests passed"
 # ---- Build Python sidecar ----
 echo ""
 echo "Building Python sidecar binary..."
+mkdir -p src-tauri/binaries
 cd sidecar
 pyinstaller --onefile --name sidecar main.py
 cp dist/sidecar ../src-tauri/binaries/sidecar-x86_64-unknown-linux-gnu

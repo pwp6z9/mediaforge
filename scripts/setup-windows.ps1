@@ -47,6 +47,7 @@ Write-Host "[OK] npm deps installed" -ForegroundColor Green
 
 # ---- Build Python sidecar ----
 Write-Host "`nBuilding Python sidecar binary..." -ForegroundColor Yellow
+New-Item -ItemType Directory -Force -Path src-tauri/binaries | Out-Null
 Push-Location sidecar
 pyinstaller --onefile --name sidecar main.py --distpath ..\src-tauri\binaries 2>$null
 # Rename to Tauri target triple
