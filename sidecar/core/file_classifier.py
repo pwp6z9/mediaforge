@@ -3,6 +3,7 @@ import os
 import hashlib
 import time
 from typing import Dict, Tuple
+import sys
 
 
 class FileClassifier:
@@ -69,7 +70,7 @@ class FileClassifier:
                 'modified_at': modified_at
             }
         except Exception as e:
-            print(f"Error classifying file {path}: {e}")
+            print(f"Error classifying file {path}: {e}", file=sys.stderr)
             return {
                 'file_type': 'unknown',
                 'extension': '',
@@ -121,5 +122,5 @@ class FileClassifier:
                     md5_hash.update(chunk)
             return md5_hash.hexdigest()
         except Exception as e:
-            print(f"Error computing MD5 for {path}: {e}")
+            print(f"Error computing MD5 for {path}: {e}", file=sys.stderr)
             return ""

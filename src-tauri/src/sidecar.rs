@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Emitter};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 

@@ -1,5 +1,6 @@
 """Face detection and recognition engine."""
 import os
+import sys
 from typing import List, Tuple, Optional, Dict
 import numpy as np
 
@@ -22,7 +23,7 @@ class FaceEngine:
             import face_recognition
             return True
         except ImportError:
-            print("Warning: face_recognition not installed")
+            print("Warning: face_recognition not installed", file=sys.stderr)
             return False
 
     def _check_cv2(self) -> bool:
@@ -31,7 +32,7 @@ class FaceEngine:
             import cv2
             return True
         except ImportError:
-            print("Warning: opencv-python not installed")
+            print("Warning: opencv-python not installed", file=sys.stderr)
             return False
 
     def load_encodings(self) -> int:
@@ -49,7 +50,7 @@ class FaceEngine:
                 return 0
 
         except Exception as e:
-            print(f"Error loading encodings: {e}")
+            print(f"Error loading encodings: {e}", file=sys.stderr)
             return 0
 
     def extract_faces_from_image(self, path: str) -> List[Tuple[np.ndarray, Dict]]:
@@ -76,7 +77,7 @@ class FaceEngine:
             return results
 
         except Exception as e:
-            print(f"Error extracting faces from image: {e}")
+            print(f"Error extracting faces from image: {e}", file=sys.stderr)
             return []
 
     def extract_faces_from_video(self, path: str, sample_fps: int = 1, max_duration: int = 30) -> List[np.ndarray]:
@@ -129,7 +130,7 @@ class FaceEngine:
             return encodings
 
         except Exception as e:
-            print(f"Error extracting faces from video: {e}")
+            print(f"Error extracting faces from video: {e}", file=sys.stderr)
             return []
 
     def _dedup_encodings(self, encodings: List[np.ndarray], distance_threshold: float = 0.4) -> List[np.ndarray]:
@@ -170,7 +171,7 @@ class FaceEngine:
             return None, None
 
         except Exception as e:
-            print(f"Error matching face: {e}")
+            print(f"Error matching face: {e}", file=sys.stderr)
             return None, None
 
     def process_file(self, path: str) -> List[Tuple[str, float]]:
@@ -200,7 +201,7 @@ class FaceEngine:
                         self.db.add_encounter(path, person_id, encoding.tobytes(), distance)
 
         except Exception as e:
-            print(f"Error processing file {path}: {e}")
+            print(f"Error processing file {path}: {e}", file=sys.stderr)
 
         return results
 
@@ -219,6 +220,6 @@ class FaceEngine:
             self.load_encodings()
 
         except Exception as e:
-            print(f"Error adding person {name}: {e}")
+            print(f"Error adding person {name}: {e}", file=sys.stderr)
 
         return person_id

@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Any
 from .models import FileRecord, PerformerRecord, PersonRecord
+import sys
 
 
 class DatabaseManager:
@@ -249,7 +250,7 @@ class DatabaseManager:
                         bitrate, positions, acts, scene_setting, series_name, scene_number,
                         source_url, camera, gps_lat, gps_lon, thumbnail_path, hash_md5, favorite
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                              ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     record.id, record.path, record.filename, record.extension,
                     record.file_type, record.content_mode, record.size_bytes,
@@ -265,7 +266,7 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except Exception as e:
-            print(f"Error upserting file: {e}")
+            print(f"Error upserting file: {e}", file=sys.stderr)
             return False
 
     def get_file(self, path: str) -> Optional[FileRecord]:
@@ -278,7 +279,7 @@ class DatabaseManager:
                 if row:
                     return self._row_to_file_record(row)
         except Exception as e:
-            print(f"Error getting file: {e}")
+            print(f"Error getting file: {e}", file=sys.stderr)
         return None
 
     def search_files(self, query: str = "", filters: Dict = None, limit: int = 50, offset: int = 0) -> Tuple[List[FileRecord], int]:
@@ -355,7 +356,7 @@ class DatabaseManager:
                 total = cursor.fetchone()['cnt']
                 return results, total
         except Exception as e:
-            print(f"Error searching files: {e}")
+            print(f"Error searching files: {e}", file=sys.stderr)
             return [], 0
 
     def get_performer(self, name: str) -> Optional[PerformerRecord]:
@@ -379,7 +380,7 @@ class DatabaseManager:
                         notes=row['notes'] or ""
                     )
         except Exception as e:
-            print(f"Error getting performer: {e}")
+            print(f"Error getting performer: {e}", file=sys.stderr)
         return None
 
     def upsert_performer(self, record: PerformerRecord) -> bool:
@@ -400,7 +401,7 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except Exception as e:
-            print(f"Error upserting performer: {e}")
+            print(f"Error upserting performer: {e}", file=sys.stderr)
             return False
 
     def link_file_performer(self, file_id: str, performer_id: str) -> bool:
@@ -415,7 +416,7 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except Exception as e:
-            print(f"Error linking file and performer: {e}")
+            print(f"Error linking file and performer: {e}", file=sys.stderr)
             return False
 
     def upsert_person(self, name: str, folder_path: str = "") -> str:
@@ -443,7 +444,7 @@ class DatabaseManager:
                 conn.commit()
                 return person_id
         except Exception as e:
-            print(f"Error upserting person: {e}")
+            print(f"Error upserting person: {e}", file=sys.stderr)
             return person_id
 
     def get_all_encodings(self) -> Tuple[List[bytes], List[str]]:
@@ -461,7 +462,7 @@ class DatabaseManager:
                     encodings.append(row['encoding'])
                     person_ids.append(row['person_id'])
         except Exception as e:
-            print(f"Error getting encodings: {e}")
+            print(f"Error getting encodings: {e}", file=sys.stderr)
         
         return encodings, person_ids
 
@@ -480,7 +481,7 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except Exception as e:
-            print(f"Error adding encoding: {e}")
+            print(f"Error adding encoding: {e}", file=sys.stderr)
             return False
 
     def add_encounter(self, file_path: str, person_id: str, encoding_bytes: bytes, distance: float) -> bool:
@@ -498,7 +499,7 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except Exception as e:
-            print(f"Error adding encounter: {e}")
+            print(f"Error adding encounter: {e}", file=sys.stderr)
             return False
 
     def get_stats(self) -> Dict[str, Any]:
@@ -546,7 +547,7 @@ class DatabaseManager:
                 'total_db_size_mb': media_size + faces_size
             }
         except Exception as e:
-            print(f"Error getting stats: {e}")
+            print(f"Error getting stats: {e}", file=sys.stderr)
             return {}
 
     def delete_file(self, path: str) -> bool:
@@ -571,7 +572,7 @@ class DatabaseManager:
                 conn.commit()
                 return True
         except Exception as e:
-            print(f"Error deleting file: {e}")
+            print(f"Error deleting file: {e}", file=sys.stderr)
             return False
 
     def _row_to_file_record(self, row) -> FileRecord:

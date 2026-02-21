@@ -9,17 +9,12 @@
 
 	let { checked = false, label, description, color = 'pink', onchange }: Props = $props();
 
-	let isChecked = $state(checked);
-
-	$effect(() => {
-		isChecked = checked;
-	});
+	let isChecked = $derived(checked);
 
 	function toggle() {
-		isChecked = !isChecked;
-		onchange?.(isChecked);
+		onchange?.(!isChecked);
 		const event = new CustomEvent('change', {
-			detail: { checked: isChecked }
+			detail: { checked: !isChecked }
 		});
 		window.dispatchEvent(event);
 	}
@@ -27,7 +22,7 @@
 
 <div class="flex items-center justify-between gap-4">
 	<div class="flex-1">
-		<label class="block text-sm font-medium text-[#F1F5F9] cursor-pointer">
+		<label for="toggle-switch" class="block text-sm font-medium text-[#F1F5F9] cursor-pointer">
 			{label}
 		</label>
 		{#if description}
@@ -36,8 +31,10 @@
 	</div>
 
 	<button
+		id="toggle-switch"
 		role="switch"
 		aria-checked={isChecked}
+		aria-label="{label}: {isChecked ? 'enabled' : 'disabled'}"
 		class="relative inline-flex h-6 w-11 rounded-full transition-all duration-300"
 		style={isChecked
 			? 'background: linear-gradient(135deg, #EC4899, #D946EF);'

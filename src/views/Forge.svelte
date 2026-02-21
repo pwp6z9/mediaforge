@@ -232,6 +232,8 @@
 			<!-- Drag & Drop Zone -->
 			<div
 				class="border-2 border-dashed rounded-lg p-8 text-center transition-all"
+				role="region"
+				aria-label="Drag and drop zone for file uploads"
 				style={dragActive
 					? 'border-color: #EC4899; background: rgba(236, 72, 153, 0.1);'
 					: 'border-color: #2A2A3E; background: transparent;'}
@@ -384,13 +386,14 @@
 						class="w-full px-3 py-2 rounded-lg bg-[#1A1A2E] border border-[#2A2A3E] text-[#F1F5F9] placeholder-[#A1A1B5] focus:border-[#EC4899] outline-none"
 					/>
 					<div>
-						<label class="text-xs text-[#A1A1B5] block mb-2">Cast</label>
+						<label for="cast-input" class="text-xs text-[#A1A1B5] block mb-2">Cast</label>
 						<div class="flex gap-2 mb-2">
 							{#each formData.cast as actor (actor)}
 								<TagPill tag={actor} removable onremove={() => removeTag('cast', actor)} />
 							{/each}
 						</div>
 						<input
+							id="cast-input"
 							type="text"
 							placeholder="Add cast member..."
 							onkeypress={(e) => {
@@ -423,8 +426,10 @@
 						class="w-full px-3 py-2 rounded-lg bg-[#1A1A2E] border border-[#2A2A3E] text-[#F1F5F9] placeholder-[#A1A1B5] focus:border-[#EC4899] outline-none"
 					></textarea>
 					<div>
-						<label class="text-xs text-[#A1A1B5] block mb-2">Rating</label>
-						<StarRating rating={formData.rating} onchange={(r) => formData.rating = r} />
+						<label class="text-xs text-[#A1A1B5] block mb-2" id="film-rating-label">Rating</label>
+						<div aria-labelledby="film-rating-label">
+							<StarRating rating={formData.rating} onchange={(r) => formData.rating = r} />
+						</div>
 					</div>
 					<div class="flex gap-2">
 						<input
@@ -478,13 +483,14 @@
 						class="w-full px-3 py-2 rounded-lg bg-[#1A1A2E] border border-[#2A2A3E] text-[#F1F5F9] placeholder-[#A1A1B5] focus:border-[#EC4899] outline-none"
 					/>
 					<div>
-						<label class="text-xs text-[#A1A1B5] block mb-2">Keywords</label>
+						<label for="keywords-input" class="text-xs text-[#A1A1B5] block mb-2">Keywords</label>
 						<div class="flex gap-2 mb-2 flex-wrap">
 							{#each formData.keywords as keyword (keyword)}
 								<TagPill tag={keyword} removable onremove={() => removeTag('keywords', keyword)} />
 							{/each}
 						</div>
 						<input
+							id="keywords-input"
 							type="text"
 							placeholder="Add keyword..."
 							onkeypress={(e) => {
@@ -534,13 +540,14 @@
 						class="w-full px-3 py-2 rounded-lg bg-[#1A1A2E] border border-[#2A2A3E] text-[#F1F5F9] placeholder-[#A1A1B5] focus:border-[#EC4899] outline-none"
 					/>
 					<div>
-						<label class="text-xs text-[#A1A1B5] block mb-2">Performers</label>
+						<label for="performers-input" class="text-xs text-[#A1A1B5] block mb-2">Performers</label>
 						<div class="flex gap-2 mb-2 flex-wrap">
 							{#each formData.performers as performer (performer)}
 								<TagPill tag={performer} removable onremove={() => removeTag('performers', performer)} />
 							{/each}
 						</div>
 						<input
+							id="performers-input"
 							type="text"
 							placeholder="Add performer..."
 							onkeypress={(e) => {

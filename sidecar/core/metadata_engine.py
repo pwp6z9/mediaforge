@@ -4,6 +4,7 @@ import json
 import os
 from typing import Dict, Any, Optional
 from pathlib import Path
+import sys
 
 
 class MetadataEngine:
@@ -144,7 +145,7 @@ class MetadataEngine:
             return metadata
 
         except Exception as e:
-            print(f"Error reading audio metadata: {e}")
+            print(f"Error reading audio metadata: {e}", file=sys.stderr)
             return {}
 
     def _read_video(self, path: str) -> Dict[str, Any]:
@@ -185,7 +186,7 @@ class MetadataEngine:
             return metadata
 
         except Exception as e:
-            print(f"Error reading video metadata: {e}")
+            print(f"Error reading video metadata: {e}", file=sys.stderr)
             return {}
 
     def _read_image(self, path: str) -> Dict[str, Any]:
@@ -212,7 +213,7 @@ class MetadataEngine:
                     pass
 
             except Exception as e:
-                print(f"Error reading image metadata: {e}")
+                print(f"Error reading image metadata: {e}", file=sys.stderr)
 
         return metadata
 

@@ -1,4 +1,4 @@
-use tauri::{AppHandle, State, Manager};
+use tauri::{AppHandle, Manager};
 use serde_json::Value;
 use crate::sidecar::{SidecarState, call_sidecar};
 
@@ -15,6 +15,7 @@ pub async fn ipc_call(
 #[tauri::command]
 pub async fn open_file_dialog(app: AppHandle) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
+    use tauri_plugin_dialog::FilePath;
     let path = app
         .dialog()
         .file()
@@ -26,22 +27,30 @@ pub async fn open_file_dialog(app: AppHandle) -> Result<Option<String>, String> 
             ],
         )
         .blocking_pick_file();
-    Ok(path.map(|p| p.to_string_lossy().to_string()))
+    Ok(path.map(|p| match p {
+        FilePath::Path(pb) => pb.to_string_lossy().to_string(),
+        _ => p.to_string(),
+    }))
 }
 
 #[tauri::command]
 pub async fn open_folder_dialog(app: AppHandle) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
+    use tauri_plugin_dialog::FilePath;
     let path = app
         .dialog()
         .file()
         .blocking_pick_folder();
-    Ok(path.map(|p| p.to_string_lossy().to_string()))
+    Ok(path.map(|p| match p {
+        FilePath::Path(pb) => pb.to_string_lossy().to_string(),
+        _ => p.to_string(),
+    }))
 }
 
 #[tauri::command]
 pub async fn open_in_default(app: AppHandle, path: String) -> Result<(), String> {
     use tauri_plugin_shell::ShellExt;
+    #[allow(deprecated)]
     app.shell()
         .open(&path, None)
         .map_err(|e| format!("Failed to open path: {}", e))?;

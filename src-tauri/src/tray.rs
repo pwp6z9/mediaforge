@@ -12,7 +12,7 @@ pub fn setup_tray(app: &mut App) -> tauri::Result<()> {
 
     let menu = Menu::with_items(app, &[&show, &sentry_toggle, &quit])?;
 
-    let app_handle = app.handle().clone();
+    let _app_handle = app.handle().clone();
     TrayIconBuilder::new()
         .icon(app.default_window_icon().unwrap().clone())
         .menu(&menu)

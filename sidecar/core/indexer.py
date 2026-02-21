@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from .models import FileRecord
+import sys
 
 
 class LibraryIndexer:
@@ -103,7 +104,7 @@ class LibraryIndexer:
             with self.lock:
                 self.progress['errors'] += 1
                 self.progress['current_file'] = path
-            print(f"Error processing {path}: {e}")
+            print(f"Error processing {path}: {e}", file=sys.stderr)
 
     def process_file(self, path: str) -> FileRecord:
         """Process a single file and extract metadata."""

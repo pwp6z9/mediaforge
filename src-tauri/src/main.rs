@@ -4,6 +4,7 @@ mod commands;
 mod sidecar;
 mod tray;
 
+#[allow(unused_imports)]
 use tauri::Manager;
 
 fn main() {

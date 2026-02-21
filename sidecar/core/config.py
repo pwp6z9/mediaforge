@@ -2,6 +2,7 @@
 import os
 import yaml
 from typing import Any, Dict, Optional
+import sys
 
 
 DEFAULT_CONFIG = {
@@ -95,7 +96,7 @@ class ConfigManager:
                 yaml.dump(self.config, f, default_flow_style=False)
             return True
         except Exception as e:
-            print(f"Error saving config: {e}")
+            print(f"Error saving config: {e}", file=sys.stderr)
             return False
 
     def get(self, key: str, default: Any = None) -> Any:

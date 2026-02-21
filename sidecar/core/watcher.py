@@ -6,6 +6,7 @@ from collections import deque
 from datetime import datetime
 from typing import Callable, Dict, Any, Optional, List
 from pathlib import Path
+import sys
 
 try:
     from watchdog.observers import Observer
@@ -14,7 +15,7 @@ try:
     WATCHDOG_AVAILABLE = True
 except ImportError:
     WATCHDOG_AVAILABLE = False
-    print("Warning: watchdog not installed")
+    print("Warning: watchdog not installed", file=sys.stderr)
 
 
 class FileWatcher(FileSystemEventHandler if WATCHDOG_AVAILABLE else object):
@@ -40,34 +41,34 @@ class FileWatcher(FileSystemEventHandler if WATCHDOG_AVAILABLE else object):
     def start(self) -> bool:
         """Start watching configured folders."""
         if not WATCHDOG_AVAILABLE:
-            print("Error: watchdog not available")
+            print("Error: watchdog not available", file=sys.stderr)
             return False
 
         try:
             watch_folders = self.config.get('watch_folders', [])
 
             if not watch_folders:
-                print("No watch folders configured")
+                print("No watch folders configured", file=sys.stderr)
                 return False
 
             # Try regular observer first, fall back to polling
             try:
                 self.observer = Observer()
             except Exception:
-                print("Falling back to polling observer")
+                print("Falling back to polling observer", file=sys.stderr)
                 self.observer = PollingObserver(timeout=10)
 
             for folder in watch_folders:
                 if os.path.exists(folder):
                     self.observer.schedule(self, folder, recursive=True)
-                    print(f"Watching: {folder}")
+                    print(f"Watching: {folder}", file=sys.stderr)
 
             self.observer.start()
             self.watching = True
             return True
 
         except Exception as e:
-            print(f"Error starting watcher: {e}")
+            print(f"Error starting watcher: {e}", file=sys.stderr)
             return False
 
     def stop(self) -> bool:
@@ -79,7 +80,7 @@ class FileWatcher(FileSystemEventHandler if WATCHDOG_AVAILABLE else object):
             self.watching = False
             return True
         except Exception as e:
-            print(f"Error stopping watcher: {e}")
+            print(f"Error stopping watcher: {e}", file=sys.stderr)
             return False
 
     def on_created(self, event):
@@ -188,7 +189,7 @@ class FileWatcher(FileSystemEventHandler if WATCHDOG_AVAILABLE else object):
 
         except Exception as e:
             self.error_count += 1
-            print(f"Error processing file {file_path}: {e}")
+            print(f"Error processing file {file_path}: {e}", file=sys.stderr)
             return False
 
     def undo_last(self) -> Dict[str, Any]:

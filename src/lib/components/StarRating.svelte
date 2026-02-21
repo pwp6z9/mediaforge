@@ -7,12 +7,9 @@
 
 	let { rating = 0, readonly = false, onchange }: Props = $props();
 
-	let currentRating = $state(rating);
 	let hoverRating = $state(0);
 
-	$effect(() => {
-		currentRating = rating;
-	});
+	let currentRating = $derived(rating);
 
 	function handleClick(index: number, isHalf: boolean) {
 		if (readonly) return;
@@ -37,6 +34,7 @@
 	{#each [0, 1, 2, 3, 4] as index (index)}
 		<div
 			class="relative w-6 h-6"
+			role="presentation"
 			onmouseenter={() => handleMouseEnter(index)}
 			onmouseleave={handleMouseLeave}
 		>
