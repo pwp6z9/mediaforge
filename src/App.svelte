@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { listen } from '@tauri-apps/api/event';
-	import { ipcCall, loadSettings } from './lib/utils/ipc';
+	import { ipcCall } from './lib/utils/ipc';
+	import { loadSettings } from './lib/stores/settings';
 	import { activityLog } from './lib/stores/sentry';
 	import Sidebar from './lib/components/Sidebar.svelte';
 	import Forge from './views/Forge.svelte';
