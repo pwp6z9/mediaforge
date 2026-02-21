@@ -1,0 +1,26 @@
+nsfw_mode: false
+library_folders: []
+watch_folders: []
+default_action: copy
+conflict_resolution: rename_increment
+duplicate_action: skip_and_log
+api_keys:
+  stashdb: ''
+  tmdb: ''
+  omdb: ''
+  acoustid_client: ''
+api_enabled:
+  stashdb: false
+  tmdb: false
+  omdb: false
+  musicbrainz: false
+  acoustid: false
+rules: []
+face_detection:
+  enabled: true
+  threshold: 0.6
+  sample_rate: 1
+thumbnails:
+  enabled: true
+  size: 256
+theme: dark-pink
