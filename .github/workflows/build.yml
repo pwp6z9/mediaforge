@@ -55,10 +55,12 @@ jobs:
       - name: Run Python sidecar tests
         run: python3 tests/test_sidecar.py
 
+      - name: Install Python build deps
+        run: |
+          pip install pyinstaller pyyaml numpy || pip install pyinstaller pyyaml numpy --break-system-packages
+
       - name: Build Python sidecar binary
         run: |
-          pip install pyinstaller --break-system-packages
-          pip install pyyaml numpy --break-system-packages
           mkdir -p src-tauri/binaries
           cd sidecar
           pyinstaller --onefile --name sidecar main.py
