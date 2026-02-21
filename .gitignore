@@ -21,6 +21,11 @@ src-tauri/binaries/
 data/*.db
 data/thumbnails/
 
+# PyInstaller
+sidecar/build/
+sidecar/dist/
+sidecar/*.spec
+
 # OS
 .DS_Store
 Thumbs.db
