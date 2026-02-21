@@ -1,0 +1,31 @@
+# Node
+node_modules/
+dist/
+.svelte-kit/
+.env
+
+# Rust
+src-tauri/target/
+
+# Python
+sidecar/__pycache__/
+sidecar/core/__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Tauri sidecar binaries (platform-specific, not committed)
+src-tauri/binaries/
+
+# Runtime data (user-specific)
+data/*.db
+data/thumbnails/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+*.suo

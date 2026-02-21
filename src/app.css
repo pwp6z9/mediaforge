@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--bg-primary: #0D0D0F;
+	--bg-secondary: #1A1A2E;
+	--bg-tertiary: #2A2A3E;
+	--primary-gradient: linear-gradient(135deg, #EC4899, #D946EF);
+	--pink-500: #EC4899;
+	--magenta-500: #D946EF;
+	--rose-400: #FB7185;
+	--text-primary: #F1F5F9;
+	--text-secondary: #A1A1B5;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+	font-size: 14px;
+	line-height: 1.5;
+	overflow: hidden;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--bg-tertiary);
+	border-radius: 4px;
+	transition: background 0.2s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #3A3A4E;
+}
+
+/* Utility Classes */
+.glass {
+	background: rgba(26, 26, 46, 0.7);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(236, 72, 153, 0.1);
+}
+
+.glow-pink {
+	box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+}
+
+.glow-magenta {
+	box-shadow: 0 0 20px rgba(217, 70, 239, 0.3);
+}
+
+.gradient-pink-magenta {
+	background: linear-gradient(135deg, #EC4899, #D946EF);
+}
+
+/* Smooth Transitions */
+button {
+	transition: all 0.2s ease-in-out;
+}
+
+input,
+textarea,
+select {
+	transition: border-color 0.2s ease-in-out;
+}
+
+/* Focus States */
+input:focus,
+textarea:focus,
+select:focus {
+	border-color: var(--pink-500) !important;
+	box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Text Selection */
+::selection {
+	background: var(--pink-500);
+	color: white;
+}
+
+/* Placeholder Styling */
+::placeholder {
+	color: var(--text-secondary) !important;
+}

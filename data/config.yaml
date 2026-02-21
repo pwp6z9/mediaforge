@@ -1,0 +1,54 @@
+# MediaForge Configuration
+# This file is auto-generated on first run and can be edited
+
+nsfw_mode: false
+
+# Library Management
+library_folders: []
+watch_folders: []
+default_action: copy
+conflict_resolution: rename_increment
+duplicate_action: skip_and_log
+
+# External API Configuration
+api_keys:
+  stashdb: ''
+  tmdb: ''
+  omdb: ''
+  acoustid_client: ''
+
+# Enable/disable specific APIs
+api_enabled:
+  stashdb: false
+  tmdb: false
+  omdb: false
+  musicbrainz: false
+  acoustid: false
+
+# Organization Rules
+rules: []
+
+# Face Detection Settings
+face_detection:
+  enabled: true
+  threshold: 0.6
+  sample_rate: 1
+
+# Thumbnail Generation
+thumbnails:
+  enabled: true
+  size: 256
+  quality: 85
+
+# UI Theme
+theme: dark-pink
+
+# Sentry Mode (File Watching)
+sentry:
+  enabled: true
+  auto_organize: false
+  watch_interval: 5000
+
+# Performance
+parallel_workers: 4
+thumbnail_cache_size: 100

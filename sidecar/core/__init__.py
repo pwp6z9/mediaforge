@@ -1,0 +1,1 @@
+"""MediaForge core module."""
