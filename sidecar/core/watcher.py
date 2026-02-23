@@ -97,18 +97,17 @@ class FileWatcher(FileSystemEventHandler if WATCHDOG_AVAILABLE else object):
         self.process_file(file_path)
 
     def _wait_for_stable(self, file_path: str, timeout: float = 30) -> bool:
-        """Wait for file to stabilize."""
+        """Wait for file to stabilize (size stops changing)."""
+        from .file_classifier import FileClassifier
+        classifier = FileClassifier()
         start_time = time.time()
-
         while time.time() - start_time < timeout:
             try:
-                if self.metadata_engine.file_classifier.is_stable(file_path, 0.5):
+                if classifier.is_stable(file_path, 0.5):
                     return True
             except Exception:
                 pass
-
             time.sleep(0.5)
-
         return False
 
     def process_file(self, file_path: str) -> bool:

@@ -6,8 +6,53 @@ import uuid
 import threading
 from datetime import datetime
 from typing import Dict, Any, Optional
+import logging
+import logging.handlers
 
-# Import core modules
+# Import core modules with error handling
+logger = logging.getLogger('mediaforge')
+
+
+def setup_logging():
+    """Set up rotating file-based logging."""
+    log_dir = os.path.expanduser('~/.mediaforge/logs')
+    os.makedirs(log_dir, exist_ok=True)
+
+    log_file = os.path.join(log_dir, 'sidecar.log')
+    latest_file = os.path.join(log_dir, 'sidecar-latest.log')
+
+    formatter = logging.Formatter(
+        '[%(asctime)s %(levelname)s %(name)s] %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+    # Rotating file handler
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_file, maxBytes=5*1024*1024, backupCount=3
+    )
+    file_handler.setFormatter(formatter)
+
+    # Latest log (overwritten each run)
+    latest_handler = logging.FileHandler(latest_file, mode='w')
+    latest_handler.setFormatter(formatter)
+
+    # Stderr handler
+    stderr_handler = logging.StreamHandler(sys.stderr)
+    stderr_handler.setFormatter(formatter)
+
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    root.addHandler(file_handler)
+    root.addHandler(latest_handler)
+    root.addHandler(stderr_handler)
+
+    logger.info('=== MediaForge Sidecar starting ===')
+    logger.info('Python %s', sys.version)
+    logger.info('Log file: %s', log_file)
+
+
+setup_logging()
+
 from core.config import ConfigManager
 from core.db import DatabaseManager
 from core.file_classifier import FileClassifier
@@ -314,7 +359,13 @@ class MediaForgeSidecar:
 
 def main():
     """Main entry point."""
-    sidecar = MediaForgeSidecar()
+    logger.info('Initializing MediaForgeSidecar...')
+    try:
+        sidecar = MediaForgeSidecar()
+        logger.info('Sidecar initialized successfully')
+    except Exception as e:
+        logger.error('FATAL: Sidecar initialization failed: %s', e, exc_info=True)
+        sys.exit(1)
     
     # Read JSON lines from stdin
     while True:

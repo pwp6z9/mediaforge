@@ -16,15 +16,31 @@
 	let toastMessage = $state('');
 	let toastType = $state<'success' | 'error' | 'info'>('info');
 
-	onMount(async () => {
-		// Check backend health
-		try {
-			await ipcCall('ping', {});
-			isHealthy = true;
-		} catch (err) {
-			console.error('Backend health check failed:', err);
-			showNotification('Failed to connect to backend', 'error');
+	let connectionAttempt = $state(0);
+	let connectionError = $state('');
+	let maxRetries = 5;
+
+	async function checkBackend() {
+		for (let i = 1; i <= maxRetries; i++) {
+			connectionAttempt = i;
+			try {
+				await ipcCall('ping', {});
+				isHealthy = true;
+				connectionError = '';
+				return;
+			} catch (err: any) {
+				console.error(`Backend check attempt ${i}/${maxRetries} failed:`, err);
+				connectionError = err?.message || String(err);
+				if (i < maxRetries) {
+					await new Promise(r => setTimeout(r, 1500 * i));
+				}
+			}
 		}
+		showNotification('Failed to connect to backend after ' + maxRetries + ' attempts', 'error');
+	}
+
+	onMount(async () => {
+		await checkBackend();
 
 		// Load settings
 		try {
@@ -80,10 +96,28 @@
 		</div>
 	{:else}
 		<div class="flex-1 flex items-center justify-center">
-			<div class="text-center">
-				<div class="text-4xl mb-4">❌</div>
-				<p class="text-[#F1F5F9] text-lg mb-2">Backend Connection Failed</p>
-				<p class="text-[#A1A1B5] text-sm">Please ensure the MediaForge backend is running</p>
+			<div class="text-center max-w-md">
+				{#if connectionAttempt > 0 && connectionAttempt <= maxRetries && !connectionError}
+					<div class="text-4xl mb-4 animate-pulse">⏳</div>
+					<p class="text-[#F1F5F9] text-lg mb-2">Connecting to backend...</p>
+					<p class="text-[#A1A1B5] text-sm">Attempt {connectionAttempt} of {maxRetries}</p>
+				{:else}
+					<div class="text-4xl mb-4">❌</div>
+					<p class="text-[#F1F5F9] text-lg mb-2">Backend Connection Failed</p>
+					{#if connectionError}
+						<div class="bg-[#1A1A2E] rounded-lg p-3 mb-4 text-left">
+							<p class="text-[#EF4444] text-xs font-mono break-all">{connectionError}</p>
+						</div>
+					{/if}
+					<button
+						onclick={() => { isHealthy = false; connectionError = ''; checkBackend(); }}
+						class="px-4 py-2 rounded-lg text-sm font-medium"
+						style="background: linear-gradient(135deg, #EC4899, #D946EF); color: white;"
+					>
+						Retry Connection
+					</button>
+					<p class="text-[#A1A1B5] text-xs mt-4">Check ~/.mediaforge/logs/ for detailed diagnostics</p>
+				{/if}
 			</div>
 		</div>
 	{/if}

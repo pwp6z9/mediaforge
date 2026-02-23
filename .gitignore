@@ -34,3 +34,9 @@ Thumbs.db
 .vscode/settings.json
 .idea/
 *.suo
+
+# PyInstaller build artifacts
+sidecar-build/
+
+# Vite timestamp files
+vite.config.ts.timestamp-*.mjs

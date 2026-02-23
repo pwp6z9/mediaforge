@@ -1,3 +1,4 @@
+use log::{debug, info, error};
 use tauri::{AppHandle, Manager};
 use serde_json::Value;
 use crate::sidecar::{SidecarState, call_sidecar};

@@ -79,9 +79,7 @@ class MetadataEngine:
             from mutagen.mp3 import MP3
             from mutagen.flac import FLAC
             from mutagen.oggvorbis import OggVorbis
-            from mutagen.oggflac import OggFLAC
             from mutagen.oggopus import OggOpus
-            from mutagen.oggtheorav import OggTheoraV
             from mutagen.m4a import M4A
             from mutagen.wave import WAVE
             from mutagen.aiff import AIFF
