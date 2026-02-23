@@ -53,10 +53,10 @@ jobs:
       - name: Install Python sidecar deps
         run: |
           sudo apt-get install -y cmake
-          pip install pyinstaller --break-system-packages
-          pip install mutagen pyyaml watchdog numpy Pillow --break-system-packages
-          pip install opencv-python-headless --break-system-packages || true
-          pip install face_recognition --break-system-packages || true
+          pip install pyinstaller || pip install pyinstaller --break-system-packages
+          pip install mutagen pyyaml watchdog numpy Pillow || pip install mutagen pyyaml watchdog numpy Pillow --break-system-packages
+          pip install opencv-python-headless || pip install opencv-python-headless --break-system-packages || true
+          pip install face_recognition || pip install face_recognition --break-system-packages || true
 
       - name: Run Python sidecar tests
         run: python3 tests/test_sidecar.py
