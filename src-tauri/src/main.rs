@@ -4,7 +4,8 @@ mod commands;
 mod sidecar;
 mod tray;
 
-use log::{info, error, warn};
+use log::{info, error};
+#[allow(unused_imports)]
 use tauri::Manager;
 use std::fs;
 use std::io::Write;

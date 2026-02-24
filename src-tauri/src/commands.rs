@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use log::{debug, info, error};
 use tauri::{AppHandle, Manager};
 use serde_json::Value;

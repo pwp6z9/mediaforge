@@ -138,7 +138,7 @@ pub async fn call_sidecar(
     }
 
     {
-        let child = state.child.lock().map_err(|e| {
+        let mut child = state.child.lock().map_err(|e| {
             error!("Failed to lock sidecar child: {}", e);
             e.to_string()
         })?;

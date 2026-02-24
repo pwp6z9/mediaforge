@@ -1,4 +1,4 @@
-use log::{info, warn};
+use log::info;
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{TrayIconBuilder, TrayIconEvent, MouseButton, MouseButtonState},
