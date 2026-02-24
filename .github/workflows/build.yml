@@ -77,6 +77,15 @@ jobs:
             --hidden-import=mutagen.asf \
             --hidden-import=mutagen.aac \
             --hidden-import=yaml \
+            --hidden-import=numpy \
+            --hidden-import=numpy.core \
+            --hidden-import=PIL \
+            --hidden-import=PIL.Image \
+            --hidden-import=watchdog \
+            --hidden-import=watchdog.observers \
+            --hidden-import=watchdog.events \
+            --hidden-import=sqlite3 \
+            --hidden-import=logging.handlers \
             main.py
           cp dist/sidecar ../src-tauri/binaries/sidecar-x86_64-unknown-linux-gnu
           chmod +x ../src-tauri/binaries/sidecar-x86_64-unknown-linux-gnu
@@ -152,6 +161,15 @@ jobs:
             --hidden-import=mutagen.asf `
             --hidden-import=mutagen.aac `
             --hidden-import=yaml `
+            --hidden-import=numpy `
+            --hidden-import=numpy.core `
+            --hidden-import=PIL `
+            --hidden-import=PIL.Image `
+            --hidden-import=watchdog `
+            --hidden-import=watchdog.observers `
+            --hidden-import=watchdog.events `
+            --hidden-import=sqlite3 `
+            --hidden-import=logging.handlers `
             main.py
           Copy-Item dist/sidecar.exe ../src-tauri/binaries/sidecar-x86_64-pc-windows-msvc.exe
 
@@ -203,9 +221,11 @@ jobs:
             - **Linux**: Download the `.AppImage` or `.deb` file
 
             ## Changes
-            - Added comprehensive logging infrastructure (Rust + Python)
-            - Fixed 7 critical bugs preventing app launch
-            - Frontend retry logic for backend connection
+            - Fixed sidecar connection hang: added timeout + pending cleanup on termination
+            - Guarded all Python imports (numpy, yaml) with try/except for graceful degradation
+            - Sidecar now responds to ping even if initialization fails
+            - Added 8+ PyInstaller hidden imports for reliable bundling
+            - Frontend retry logic with proper error reporting
           draft: false
           prerelease: true
           files: |

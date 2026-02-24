@@ -5,6 +5,7 @@ use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use log::{info, error, warn, debug};
+use std::time::Duration;
 
 pub struct SidecarState {
     pub child: Arc<Mutex<CommandChild>>,
@@ -100,7 +101,21 @@ pub fn start_sidecar(app: AppHandle) -> Result<(), Box<dyn std::error::Error>> {
                     error!("Sidecar process error: {}", err);
                 }
                 CommandEvent::Terminated(status) => {
-                    warn!("Sidecar process terminated with status: {:?}", status);
+                    error!("Sidecar process terminated with status: {:?}", status);
+                    // Clean up all pending requests so callers don't hang forever
+                    let mut pending = pending_clone.lock().unwrap();
+                    let count = pending.len();
+                    if count > 0 {
+                        warn!("Draining {} pending requests after sidecar termination", count);
+                        for (id, sender) in pending.drain() {
+                            let err_response = json!({
+                                "id": id,
+                                "error": "Sidecar process terminated unexpectedly",
+                                "result": null
+                            });
+                            let _ = sender.send(err_response);
+                        }
+                    }
                     break;
                 }
                 _ => {}
@@ -152,10 +167,19 @@ pub async fn call_sidecar(
         })?;
     }
 
-    let response = rx.await.map_err(|e| {
-        error!("Sidecar response channel closed for '{}': {}", method, e);
-        format!("Sidecar communication failed for '{}': {}", method, e)
-    })?;
+    let response = tokio::time::timeout(Duration::from_secs(30), rx)
+        .await
+        .map_err(|_| {
+            error!("Sidecar call '{}' timed out after 30s", method);
+            // Clean up the pending request so it doesn't leak
+            let mut pending = state.pending.lock().unwrap();
+            pending.remove(&id);
+            format!("Sidecar call '{}' timed out after 30 seconds", method)
+        })?
+        .map_err(|e| {
+            error!("Sidecar response channel closed for '{}': {}", method, e);
+            format!("Sidecar communication failed for '{}': {}", method, e)
+        })?;
 
     if let Some(err) = response.get("error").filter(|e| !e.is_null()) {
         warn!("Sidecar returned error for '{}': {}", method, err);

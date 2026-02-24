@@ -2,7 +2,14 @@
 import os
 import sys
 from typing import List, Tuple, Optional, Dict
-import numpy as np
+
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    np = None
+    NUMPY_AVAILABLE = False
+    print("Warning: numpy not installed — face engine will be limited", file=sys.stderr)
 
 
 class FaceEngine:
@@ -12,8 +19,9 @@ class FaceEngine:
         """Initialize face engine."""
         self.db = db_manager
         self.threshold = threshold
-        self.known_encodings = np.array([])
+        self.known_encodings = np.array([]) if NUMPY_AVAILABLE else []
         self.known_ids = []
+        self.numpy_available = NUMPY_AVAILABLE
         self.face_recognition_available = self._check_face_recognition()
         self.cv2_available = self._check_cv2()
 
@@ -37,6 +45,8 @@ class FaceEngine:
 
     def load_encodings(self) -> int:
         """Load all face encodings from database."""
+        if not NUMPY_AVAILABLE:
+            return 0
         try:
             encodings, person_ids = self.db.get_all_encodings()
 

@@ -1,8 +1,16 @@
 """Configuration manager for MediaForge."""
 import os
-import yaml
+import json
 from typing import Any, Dict, Optional
 import sys
+
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    yaml = None
+    YAML_AVAILABLE = False
+    print("Warning: pyyaml not installed — using JSON fallback for config", file=sys.stderr)
 
 
 DEFAULT_CONFIG = {
@@ -56,7 +64,15 @@ class ConfigManager:
         """Load config from file or create default."""
         try:
             with open(self.config_path, 'r') as f:
-                loaded = yaml.safe_load(f)
+                content = f.read()
+                if YAML_AVAILABLE:
+                    loaded = yaml.safe_load(content)
+                else:
+                    # Try JSON fallback
+                    try:
+                        loaded = json.loads(content)
+                    except json.JSONDecodeError:
+                        loaded = {}
                 if loaded is None:
                     loaded = {}
                 # Merge with defaults to ensure all keys exist
@@ -65,18 +81,35 @@ class ConfigManager:
                 return merged
         except FileNotFoundError:
             # Create default config file
-            with open(self.config_path, 'w') as f:
-                yaml.dump(DEFAULT_CONFIG, f, default_flow_style=False)
+            self._write_config(DEFAULT_CONFIG)
             return DEFAULT_CONFIG.copy()
+
+    def _write_config(self, data: Dict[str, Any], path: str = None):
+        """Write config data to file (yaml if available, else json)."""
+        if path is None:
+            path = self.config_path
+        os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
+        with open(path, 'w') as f:
+            if YAML_AVAILABLE:
+                yaml.dump(data, f, default_flow_style=False)
+            else:
+                json.dump(data, f, indent=2)
 
     def load(self, path: str = None) -> Dict[str, Any]:
         """Load config from a specific path."""
         if path is None:
             path = self.config_path
-        
+
         try:
             with open(path, 'r') as f:
-                loaded = yaml.safe_load(f)
+                content = f.read()
+                if YAML_AVAILABLE:
+                    loaded = yaml.safe_load(content)
+                else:
+                    try:
+                        loaded = json.loads(content)
+                    except json.JSONDecodeError:
+                        loaded = {}
                 if loaded is None:
                     loaded = {}
                 merged = DEFAULT_CONFIG.copy()
@@ -89,11 +122,9 @@ class ConfigManager:
         """Save config to file."""
         if path is None:
             path = self.config_path
-        
+
         try:
-            os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
-            with open(path, 'w') as f:
-                yaml.dump(self.config, f, default_flow_style=False)
+            self._write_config(self.config, path)
             return True
         except Exception as e:
             print(f"Error saving config: {e}", file=sys.stderr)

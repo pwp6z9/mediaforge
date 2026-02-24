@@ -24,7 +24,12 @@
 		for (let i = 1; i <= maxRetries; i++) {
 			connectionAttempt = i;
 			try {
-				await ipcCall('ping', {});
+				const result = await ipcCall('ping', {});
+				if (result?.init_error) {
+					console.warn('Backend started in degraded mode:', result.init_error);
+					connectionError = `Backend degraded: ${result.init_error}`;
+					// Still mark as healthy — app can show partial UI
+				}
 				isHealthy = true;
 				connectionError = '';
 				return;

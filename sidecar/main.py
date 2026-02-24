@@ -53,16 +53,35 @@ def setup_logging():
 
 setup_logging()
 
-from core.config import ConfigManager
-from core.db import DatabaseManager
-from core.file_classifier import FileClassifier
-from core.metadata_engine import MetadataEngine
-from core.face_engine import FaceEngine
-from core.api_client import ApiClient
-from core.rules import RuleEngine
-from core.watcher import FileWatcher
-from core.indexer import LibraryIndexer
-from core.models import SidecarResponse
+# Import core modules with error handling — if any fail, sidecar should
+# still start and respond to ping so the frontend doesn't hang
+_import_errors = []
+
+try:
+    from core.config import ConfigManager
+    from core.db import DatabaseManager
+    from core.file_classifier import FileClassifier
+    from core.metadata_engine import MetadataEngine
+    from core.face_engine import FaceEngine
+    from core.api_client import ApiClient
+    from core.rules import RuleEngine
+    from core.watcher import FileWatcher
+    from core.indexer import LibraryIndexer
+    from core.models import SidecarResponse
+except ImportError as e:
+    logger.error('Failed to import core modules: %s', e, exc_info=True)
+    _import_errors.append(str(e))
+    # Define minimal SidecarResponse for error reporting
+    class SidecarResponse:
+        def __init__(self, id, result=None, error=None):
+            self.id = id
+            self.result = result
+            self.error = error
+        def to_dict(self):
+            d = {'id': self.id, 'result': self.result}
+            if self.error:
+                d['error'] = self.error
+            return d
 
 
 class MediaForgeSidecar:
@@ -359,24 +378,54 @@ class MediaForgeSidecar:
 
 def main():
     """Main entry point."""
-    logger.info('Initializing MediaForgeSidecar...')
-    try:
-        sidecar = MediaForgeSidecar()
-        logger.info('Sidecar initialized successfully')
-    except Exception as e:
-        logger.error('FATAL: Sidecar initialization failed: %s', e, exc_info=True)
-        sys.exit(1)
-    
-    # Read JSON lines from stdin
+    sidecar = None
+    init_error = None
+
+    if _import_errors:
+        init_error = f"Core module import failed: {'; '.join(_import_errors)}"
+        logger.error('Sidecar running in degraded mode: %s', init_error)
+    else:
+        logger.info('Initializing MediaForgeSidecar...')
+        try:
+            sidecar = MediaForgeSidecar()
+            logger.info('Sidecar initialized successfully')
+        except Exception as e:
+            init_error = str(e)
+            logger.error('Sidecar initialization failed: %s', e, exc_info=True)
+            logger.info('Sidecar will respond to ping but other methods will fail')
+
+    # Read JSON lines from stdin — ALWAYS enter the loop so we can respond
+    # to ping even if initialization failed
     while True:
         try:
             line = sys.stdin.readline()
             if not line:
                 break
-            
-            request = json.loads(line.strip())
-            response = sidecar.handle_request(request)
-            
+
+            line = line.strip()
+            if not line:
+                continue
+
+            request = json.loads(line)
+            request_id = request.get('id', '')
+            method = request.get('method', '')
+
+            # Handle ping even if sidecar init failed
+            if method == 'ping':
+                response = SidecarResponse(request_id, {
+                    'pong': True,
+                    'version': '1.0.0',
+                    'healthy': sidecar is not None,
+                    'init_error': init_error,
+                })
+            elif sidecar is None:
+                response = SidecarResponse(
+                    request_id, None,
+                    init_error or 'Sidecar not initialized'
+                )
+            else:
+                response = sidecar.handle_request(request)
+
             # Send response
             json.dump(response.to_dict(), sys.stdout)
             sys.stdout.write('\n')
@@ -389,6 +438,15 @@ def main():
             break
         except Exception as e:
             print(f"Error: {e}", file=sys.stderr)
+            # Try to send error response if we have a request_id
+            try:
+                if 'request_id' in dir():
+                    err_resp = SidecarResponse(request_id, None, str(e))
+                    json.dump(err_resp.to_dict(), sys.stdout)
+                    sys.stdout.write('\n')
+                    sys.stdout.flush()
+            except Exception:
+                pass
             continue
 
 
